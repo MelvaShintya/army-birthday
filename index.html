@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A Special Gift for Aura</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (Untuk Layout Dasar) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            bg: '#F9F5FF', text: '#2D1B4E', accent: '#8B5CF6', light: '#DDD6FE', card: '#FFFFFF'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 4s ease-in-out infinite',
+                        'float-delayed': 'float 4s ease-in-out 2s infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-12px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Confetti JS -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body { 
+            -webkit-tap-highlight-color: transparent; 
+            background: radial-gradient(circle at top right, #F3E8FF, #FFFFFF, #F5F3FF); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+            color: #2D1B4E;
+        }
+        .screen-hidden { display: none !important; }
+        .screen-active { display: flex; animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes slideUp {
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-premium {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.3);
+        }
+        .btn-premium:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(139, 92, 246, 0.4); }
+        .btn-premium:active { transform: scale(0.96); box-shadow: 0 5px 10px -3px rgba(139, 92, 246, 0.3); }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #C4B5FD; border-radius: 10px; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 25px 50px -12px rgba(139, 92, 246, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 1);
+        }
+
+        @keyframes flowerFall {
+            0% { transform: translateY(-10vh) rotate(0deg) scale(0.8); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg) scale(1.2); opacity: 0.1; }
+        }
+        .flower-item { position: fixed; z-index: 10; pointer-events: none; animation: flowerFall linear infinite; }
+        #flower-container { position: fixed; inset: 0; pointer-events: none; z-index: 10; overflow: hidden; display: none; }
+
+        .photo-frame {
+            background: white; padding: 8px; border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            border: 1px solid #F3F4F6; transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .photo-frame:hover {
+            transform: translateY(-5px) rotate(1deg);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .otp-input {
+            width: 3.5rem; height: 4rem; text-align: center; font-size: 1.5rem; font-weight: 900;
+            background: #F5F3FF; color: #6D28D9; border-radius: 1rem; border: 2px solid #EDE9FE;
+            transition: all 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .otp-input:focus { background: #FFFFFF; border-color: #8B5CF6; outline: none; box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2); transform: translateY(-2px); }
+        .otp-input.year-input { width: 5rem; }
+
+
+        /* =========================================
+           CUSTOM CSS UNTUK LIGHTBOX (POP-UP GALLERY)
+           ========================================= */
+        .custom-lightbox {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 10, 30, 0.85); /* Overlay ungu gelap */
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 1rem;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s;
+        }
+        .custom-lightbox.show {
+            opacity: 1; visibility: visible;
+        }
+
+        /* Tombol Close Elegan */
+        .btn-close-lightbox {
+            position: absolute; top: 25px; right: 25px;
+            width: 45px; height: 45px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            color: #fff; font-size: 22px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 10001;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .btn-close-lightbox:hover {
+            background: rgba(255, 255, 255, 0.4); 
+            transform: rotate(90deg) scale(1.1); /* Efek mutar saat disorot */
+        }
+        .btn-close-lightbox:active { transform: scale(0.9); }
+
+        /* Wrapper Konten Pop-up */
+        .lightbox-content-wrapper {
+            width: 100%; max-width: 450px;
+            transform: scale(0.9) translateY(30px);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .custom-lightbox.show .lightbox-content-wrapper {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Desain Polaroid Estetik Dalam Pop-up */
+        .lightbox-polaroid {
+            background: #ffffff; 
+            padding: 16px 16px 24px 16px;
+            border-radius: 16px;
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            position: relative;
+        }
+        .lightbox-polaroid img, .lightbox-polaroid video {
+            width: 100%; max-height: 65vh; object-fit: cover; 
+            border-radius: 8px; border: 1px solid #f0f0f0;
+        }
+        .lightbox-polaroid video { background: #000; }
+        .lightbox-polaroid p {
+            text-align: center; font-weight: 800; color: #2D1B4E; 
+            margin-top: 16px; font-size: 1.25rem; font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased relative">
+
+    <div id="flower-container"></div>
+
+    <button id="bgmToggle" class="fixed top-5 right-5 z-50 flex items-center gap-2 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-full shadow-lg border border-purple-100 text-xs font-bold text-brand-accent transition-transform hover:scale-105 active:scale-95">
+        <span id="bgm-icon">🔇 Audio Off</span>
+    </button>
+    <audio id="bgmAudio" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg"></audio>
+
+    <main class="flex flex-col items-center justify-center w-full min-h-screen p-5 relative z-20">
+
+        <!-- SCREEN 1: LANDING -->
+        <section id="screen-landing" class="screen-active flex-col items-center justify-center text-center w-full max-w-sm mx-auto space-y-6">
+            <div class="relative w-24 h-24 mb-2 animate-float">
+                <div class="absolute inset-0 bg-brand-accent rounded-full opacity-20 blur-xl"></div>
+                <div class="relative text-7xl drop-shadow-xl">💜</div>
+            </div>
+            <div>
+                <p class="text-brand-accent font-bold tracking-[0.2em] uppercase text-xs mb-3 text-purple-600">A Digital Experience</p>
+                <h1 class="text-4xl sm:text-5xl font-black text-brand-text leading-tight tracking-tight">
+                    Happy Birthday,<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-accent to-pink-500">Aura!</span>
+                </h1>
+            </div>
+            <p class="text-sm text-gray-500 px-2 leading-relaxed font-medium">
+                Sebuah perjalanan kecil telah disiapkan khusus untukmu. Tapi... ARMY sejati harus lolos ujian dulu! Siap?
+            </p>
+            <button onclick="startGame1()" class="w-full max-w-[16rem] mt-6 bg-gradient-to-r from-brand-accent to-purple-600 text-white px-8 py-4 rounded-2xl font-bold text-lg btn-premium cursor-pointer">
+                Let's Go! ✨
+            </button>
+        </section>
+
+        <!-- SCREEN 2: GAME 1 -->
+        <section id="screen-game1" class="screen-hidden flex-col w-full max-w-md mx-auto justify-center">
+            <div class="glass-card rounded-[2rem] p-7 sm:p-8 w-full relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-purple-50">
+                    <div id="g1-progress-bar" class="h-full bg-gradient-to-r from-purple-400 to-brand-accent transition-all duration-500 rounded-r-full" style="width: 20%"></div>
+                </div>
+                
+                <div class="flex justify-between items-center mb-6 mt-2">
+                    <h2 class="text-lg font-black text-brand-text tracking-wide">Tebak Member</h2>
+                    <span id="g1-progress" class="text-xs font-bold bg-purple-100 text-purple-700 px-3 py-1 rounded-full shadow-sm">1/5</span>
+                </div>
+                
+                <div class="aspect-square w-full mb-6 rounded-2xl overflow-hidden shadow-md border-4 border-white bg-gray-50 relative group">
+                    <img id="g1-image" src="" class="object-cover w-full h-full transition-opacity duration-300 group-hover:scale-105 transition-transform">
+                </div>
+                
+                <div id="g1-options" class="grid grid-cols-2 gap-3 mb-2"></div>
+                <p id="g1-feedback" class="text-center font-bold text-sm h-6 mt-4 transition-all opacity-0"></p>
+            </div>
+        </section>
+
+        <!-- SCREEN 3: GAME 2 (SONG) -->
+        <section id="screen-game2" class="screen-hidden flex-col w-full max-w-md mx-auto justify-center">
+            <div class="glass-card rounded-[2rem] p-7 sm:p-8 w-full relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-pink-50">
+                    <div id="g2-progress-bar" class="h-full bg-gradient-to-r from-pink-400 to-pink-600 transition-all duration-500 rounded-r-full" style="width: 20%"></div>
+                </div>
+
+                <div class="flex justify-between items-center mb-6 mt-2">
+                    <h2 class="text-lg font-black text-brand-text tracking-wide">Tebak Lagu</h2>
+                    <span id="g2-progress" class="text-xs font-bold bg-pink-100 text-pink-700 px-3 py-1 rounded-full shadow-sm">1/5</span>
+                </div>
+                
+                <div class="aspect-video bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl flex flex-col items-center justify-center p-6 mb-6 shadow-inner border-2 border-white relative overflow-hidden">
+                    <div class="absolute top-[-20px] left-[-20px] w-24 h-24 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-50"></div>
+                    <div class="absolute bottom-[-20px] right-[-20px] w-24 h-24 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-50"></div>
+                    
+                    <button id="g2-playBtn" class="w-16 h-16 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-full flex items-center justify-center shadow-xl btn-premium animate-bounce-slow cursor-pointer z-10 relative border-2 border-white/50">
+                        <svg class="w-7 h-7 ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"></path></svg>
+                    </button>
+                    <p id="g2-status" class="text-xs font-bold text-purple-700 mt-4 bg-white/80 px-4 py-1.5 rounded-full shadow-sm z-10 backdrop-blur">Tap to Play</p>
+                </div>
+
+                <div id="g2-options" class="flex flex-col gap-3 mb-2"></div>
+                <p id="g2-feedback" class="text-center font-bold text-sm h-6 mt-4 transition-all opacity-0"></p>
+            </div>
+        </section>
+
+        <!-- SCREEN 4: SECRET PASSWORD -->
+        <section id="screen-secret" class="screen-hidden flex-col items-center justify-center text-center w-full max-w-sm mx-auto">
+            <div class="glass-card rounded-[2rem] p-8 w-full shadow-2xl relative overflow-hidden">
+                <div class="text-6xl mb-6 animate-float drop-shadow-xl">🗝️</div>
+                <h2 class="text-2xl font-black text-brand-text mb-2 tracking-tight">Pintu Terakhir</h2>
+                <p class="text-sm text-gray-500 mb-8 font-medium">Masukkan kode brankas.<br><span class="font-bold text-brand-accent">Clue: Tanggal Ulang Tahunmu</span></p>
+                
+                <div class="flex justify-center items-center gap-2 mb-8">
+                    <input type="tel" id="pwd-dd" maxlength="2" placeholder="DD" class="otp-input" oninput="moveToNext(this, 'pwd-mm', 2)">
+                    <span class="text-purple-300 font-bold text-xl">/</span>
+                    <input type="tel" id="pwd-mm" maxlength="2" placeholder="MM" class="otp-input" oninput="moveToNext(this, 'pwd-yyyy', 2)">
+                    <span class="text-purple-300 font-bold text-xl">/</span>
+                    <input type="tel" id="pwd-yyyy" maxlength="4" placeholder="YYYY" class="otp-input year-input">
+                </div>
+
+                <button onclick="checkPassword()" class="w-full bg-brand-text text-white px-6 py-4 rounded-xl font-bold transition-all shadow-xl hover:bg-black hover:shadow-2xl hover:-translate-y-1 active:scale-95 cursor-pointer">
+                    Buka Hadiah 🎁
+                </button>
+                <p id="pwd-feedback" class="text-red-500 font-bold text-sm h-6 mt-4 opacity-0 transition-opacity"></p>
+            </div>
+        </section>
+
+        <!-- SCREEN 5: GIFT BOX -->
+        <section id="screen-gift" class="screen-hidden flex-col items-center justify-center text-center w-full max-w-sm mx-auto min-h-[70vh]">
+            <h2 class="text-3xl font-black text-brand-text mb-4">Misi Selesai! 🎉</h2>
+            <p class="text-brand-accent font-medium mb-12 bg-purple-100 px-4 py-1.5 rounded-full text-sm shadow-sm inline-block">Ketuk kado untuk membukanya</p>
+            
+            <div class="relative cursor-pointer transition-transform hover:scale-105 active:scale-95 group" onclick="openGift()">
+                <div class="absolute inset-0 bg-brand-accent rounded-full blur-3xl opacity-30 animate-pulse-slow group-hover:opacity-50 transition-opacity"></div>
+                <img id="img-gift-box" src="" alt="Gift Box" class="w-72 h-72 object-contain relative z-10 animate-float drop-shadow-2xl">
+            </div>
+        </section>
+
+        <!-- SCREEN 6: FINAL (LETTER & GALLERY) -->
+        <section id="screen-final" class="screen-hidden flex-col items-center w-full max-w-md mx-auto pt-12 pb-24 relative">
+            
+            <div class="absolute -top-10 z-30 w-full flex justify-center pointer-events-none">
+                <img id="img-bouquet" src="" alt="Bouquet" class="w-48 h-48 object-contain drop-shadow-2xl animate-float-delayed">
+            </div>
+
+            <div class="bg-white rounded-[2rem] p-8 sm:p-10 w-full relative mb-12 mt-16 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-gray-50 z-20">
+                <div class="absolute top-4 right-4 opacity-10">
+                    <svg class="w-16 h-16 text-brand-accent" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+                
+                <p class="text-xs font-bold text-gray-400 tracking-[0.2em] uppercase mb-4">Untuk Aura</p>
+                
+                <div class="space-y-6 text-gray-700 mt-2 text-justify font-medium text-[15px] leading-loose">
+                    <p>Selamat bertambah usia! Semoga hari-harimu selalu diisi dengan ketenangan, kebahagiaan, dan pencapaian-pencapaian kecil yang bermakna.</p>
+                    <p>Terima kasih sudah menjadi versi terbaik dari dirimu. Jangan lupa selalu luangkan waktu untuk merawat diri sendiri.</p>
+                    
+                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-brand-accent shadow-sm my-6 relative overflow-hidden">
+                        <p class="italic font-bold text-brand-text text-base relative z-10 leading-relaxed">
+                            "No matter who you are, where you’re from, your skin color, gender identity: speak yourself." <br><span class="text-sm font-black text-brand-accent mt-2 block">- RM</span>
+                        </p>
+                    </div>
+                    
+                    <div class="pt-6 border-t border-gray-100 flex flex-col items-center">
+                        <p class="font-black text-brand-accent text-2xl tracking-wide">Borahae! 💜</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GALLERY -->
+            <div class="w-full text-center">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-black text-brand-text drop-shadow-sm">Visual Memories</h2>
+                    <p class="text-brand-accent font-medium mt-1">Beberapa memori yang tertinggal.</p>
+                </div>
+                
+                <div id="gallery-grid" class="grid grid-cols-2 gap-4 w-full px-2">
+                    <!-- Gallery inject -->
+                </div>
+            </div>
+            
+        </section>
+
+        <!-- LIGHTBOX (CUSTOM CSS) -->
+        <div id="lightbox" class="custom-lightbox">
+            <!-- Tombol Close -->
+            <button onclick="closeLightbox()" class="btn-close-lightbox" aria-label="Tutup Galeri">✕</button>
+            
+            <!-- Tempat Konten Foto/Video -->
+            <div id="lightbox-content" class="lightbox-content-wrapper"></div>
+        </div>
+
+    </main>
+
+    <script>
+        // ===============================================
+        // 1. CONFIGURATION
+        // ===============================================
+        const CONFIG = {
+            pwdTanggal: "29", pwdBulan: "01", pwdTahun: "2006",
+            
+            giftImage: "assets/images/gift.png",
+            bouquetImage: "assets/images/bouquet.png",
+            flowerImage: "assets/images/flower.png",
+            
+            game1Data: [
+                { img: "https://placehold.co/400x400/9333EA/FFFFFF?text=Foto+Member+1", options: ["Jimin", "Suga", "Taehyung", "Jin"], correct: "Suga" },
+                { img: "https://placehold.co/400x400/D8B4FE/2D1B4E?text=Foto+Member+2", options: ["Jungkook", "RM", "J-Hope", "Jin"], correct: "Jungkook" },
+                { img: "https://placehold.co/400x400/EC4899/FFFFFF?text=Foto+Member+3", options: ["Jin", "Jimin", "Suga", "Taehyung"], correct: "Jin" },
+                { img: "https://placehold.co/400x400/9333EA/FFFFFF?text=Foto+Member+4", options: ["RM", "Jungkook", "J-Hope", "Suga"], correct: "RM" },
+                { img: "https://placehold.co/400x400/2D1B4E/FFFFFF?text=Foto+Member+5", options: ["Suga", "Jimin", "Taehyung", "Jin"], correct: "Taehyung" }
+            ],
+            
+            game2Data: [
+                { audio: "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3", options: ["Blood Sweat & Tears", "Fake Love", "Black Swan", "Singularity"], correct: "Blood Sweat & Tears" },
+                { audio: "https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3", options: ["134340", "Pied Piper", "Love Maze", "Dimple"], correct: "134340" },
+                { audio: "https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3", options: ["DNA", "Make It Right", "Filter", "Boy With Luv"], correct: "DNA" },
+                { audio: "https://assets.mixkit.co/active_storage/sfx/2871/2871-preview.mp3", options: ["Dionysus", "UGH!", "Mic Drop", "Daechwita"], correct: "UGH!" },
+                { audio: "https://assets.mixkit.co/active_storage/sfx/2872/2872-preview.mp3", options: ["Film Out", "Let Go", "Crystal Snow", "Your eyes tell"], correct: "Let Go" }
+            ],
+            
+            galleryData: [
+                { type: "image", src: "https://picsum.photos/400/500?random=1", caption: "Seoul 2023" },
+                { type: "image", src: "https://picsum.photos/400/500?random=2", caption: "Concert Day" },
+                { type: "image", src: "https://picsum.photos/400/500?random=3", caption: "Sweet Memories" },
+                { type: "video", src: "https://www.w3schools.com/html/mov_bbb.mp4", caption: "Vlog Time" }
+            ]
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("img-gift-box").src = CONFIG.giftImage;
+            document.getElementById("img-bouquet").src = CONFIG.bouquetImage;
+        });
+
+        // Audio Logic
+        let isBgmPlaying = false;
+        const bgm = document.getElementById("bgmAudio");
+        document.getElementById("bgmToggle").addEventListener("click", () => {
+            if (isBgmPlaying) {
+                bgm.pause(); document.getElementById("bgm-icon").innerText = "🔇 Audio Off";
+            } else {
+                bgm.play().catch(e => console.log("Blocked")); document.getElementById("bgm-icon").innerText = "🔊 Audio On";
+            }
+            isBgmPlaying = !isBgmPlaying;
+        });
+
+        // Animations
+        function fireConfetti() {
+            var duration = 3000; var end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#9333EA', '#D8B4FE', '#FFFFFF', '#EC4899'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#9333EA', '#D8B4FE', '#FFFFFF', '#EC4899'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+
+        function startFallingFlowers() {
+            const container = document.getElementById('flower-container');
+            container.style.display = 'block';
+            function createFlower() {
+                const img = document.createElement('img'); img.src = CONFIG.flowerImage; img.className = 'flower-item';
+                const size = Math.random() * 30 + 30; img.style.width = `${size}px`; img.style.height = `${size}px`;
+                img.style.left = `${Math.random() * 100}vw`;
+                const duration = Math.random() * 6 + 6; img.style.animationDuration = `${duration}s`; img.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(img); setTimeout(() => img.remove(), (duration + 5) * 1000);
+            }
+            for(let i=0; i<15; i++) createFlower();
+            setInterval(createFlower, 1500);
+        }
+
+        // Navigation
+        function switchScreen(hide, show) {
+            document.getElementById(hide).classList.replace('screen-active', 'screen-hidden');
+            document.getElementById(show).classList.replace('screen-hidden', 'screen-active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Game 1
+        let g1Index = 0;
+        function startGame1() {
+            g1Index = 0; switchScreen('screen-landing', 'screen-game1');
+            if(!isBgmPlaying) { bgm.play().catch(e=>console.log(e)); isBgmPlaying=true; document.getElementById("bgm-icon").innerText = "🔊 Audio On"; }
+            loadG1();
+        }
+        function loadG1() {
+            if(g1Index >= 5) { setTimeout(() => { switchScreen('screen-game1', 'screen-game2'); loadG2(); }, 800); return; }
+            const data = CONFIG.game1Data[g1Index];
+            document.getElementById('g1-progress').innerText = `${g1Index + 1}/5`;
+            document.getElementById('g1-progress-bar').style.width = `${((g1Index + 1) / 5) * 100}%`;
+            document.getElementById('g1-image').src = data.img;
+            const opts = document.getElementById('g1-options'); opts.innerHTML = '';
+            document.getElementById('g1-feedback').style.opacity = '0';
+            data.options.forEach(opt => {
+                let btn = document.createElement('button');
+                btn.className = "py-3.5 bg-white border border-gray-100 rounded-xl font-bold text-brand-text text-sm shadow-sm transition-all hover:border-brand-accent hover:bg-purple-50 active:scale-95 cursor-pointer";
+                btn.innerText = opt; btn.onclick = () => checkG1(btn, opt, data.correct); opts.appendChild(btn);
+            });
+        }
+        function checkG1(btn, selected, correct) {
+            Array.from(document.getElementById('g1-options').children).forEach(b => b.disabled = true);
+            const fb = document.getElementById('g1-feedback'); fb.style.opacity = '1';
+            if(selected === correct) {
+                btn.classList.add('bg-green-50', 'border-green-400', 'text-green-700'); fb.innerText = "✨ Benar!"; fb.className = "text-center font-bold text-sm h-6 mt-4 text-green-500";
+                setTimeout(() => { g1Index++; loadG1(); }, 800);
+            } else {
+                btn.classList.add('bg-red-50', 'border-red-400', 'text-red-700'); fb.innerText = "❌ Salah! Coba lagi."; fb.className = "text-center font-bold text-sm h-6 mt-4 text-red-500";
+                setTimeout(() => { loadG1(); }, 1200); 
+            }
+        }
+
+        // Game 2
+        let g2Index = 0, currentAudio = null;
+        function loadG2() {
+            if(g2Index >= 5) { setTimeout(() => switchScreen('screen-game2', 'screen-secret'), 800); return; }
+            const data = CONFIG.game2Data[g2Index];
+            document.getElementById('g2-progress').innerText = `${g2Index + 1}/5`;
+            document.getElementById('g2-progress-bar').style.width = `${((g2Index + 1) / 5) * 100}%`;
+            const fb = document.getElementById('g2-feedback'); fb.style.opacity = '0';
+            if(currentAudio) currentAudio.pause(); currentAudio = new Audio(data.audio);
+            const pBtn = document.getElementById('g2-playBtn'); const status = document.getElementById('g2-status');
+            status.innerText = "Tap to Play"; pBtn.classList.add('animate-bounce-slow');
+            pBtn.onclick = () => { bgm.pause(); currentAudio.play(); status.innerText = "🎵 Playing..."; pBtn.classList.remove('animate-bounce-slow'); };
+            currentAudio.onended = () => { status.innerText = "Selesai!"; if(isBgmPlaying) bgm.play(); };
+            const opts = document.getElementById('g2-options'); opts.innerHTML = '';
+            data.options.forEach(opt => {
+                let btn = document.createElement('button');
+                btn.className = "py-3.5 w-full bg-white border border-gray-100 rounded-xl font-bold text-brand-text text-sm shadow-sm transition-all hover:border-pink-400 hover:bg-pink-50 active:scale-95 cursor-pointer";
+                btn.innerText = opt; btn.onclick = () => checkG2(btn, opt, data.correct); opts.appendChild(btn);
+            });
+        }
+        function checkG2(btn, selected, correct) {
+            if(currentAudio) currentAudio.pause(); if(isBgmPlaying) bgm.play();
+            Array.from(document.getElementById('g2-options').children).forEach(b => b.disabled = true);
+            const fb = document.getElementById('g2-feedback'); fb.style.opacity = '1';
+            if(selected === correct) {
+                btn.classList.add('bg-green-50', 'border-green-400', 'text-green-700'); fb.innerText = "🎧 Perfect!"; fb.className = "text-center font-bold text-sm h-6 mt-4 text-green-500";
+                setTimeout(() => { g2Index++; loadG2(); }, 800);
+            } else {
+                btn.classList.add('bg-red-50', 'border-red-400', 'text-red-700'); fb.innerText = "❌ Kurang tepat!"; fb.className = "text-center font-bold text-sm h-6 mt-4 text-red-500";
+                setTimeout(() => { loadG2(); }, 1200);
+            }
+        }
+
+        // Password & Gift
+        function moveToNext(current, nextFieldId, maxLength) { if (current.value.length >= maxLength) document.getElementById(nextFieldId).focus(); }
+        function checkPassword() {
+            const dd = document.getElementById('pwd-dd').value.padStart(2, '0'), mm = document.getElementById('pwd-mm').value.padStart(2, '0'), yyyy = document.getElementById('pwd-yyyy').value;
+            const fb = document.getElementById('pwd-feedback');
+            if (dd === CONFIG.pwdTanggal && mm === CONFIG.pwdBulan && yyyy === CONFIG.pwdTahun) {
+                fb.style.opacity = '0'; switchScreen('screen-secret', 'screen-gift');
+            } else {
+                fb.innerText = "Kode salah. Hint: 29 01 2006"; fb.style.opacity = '1';
+                document.querySelectorAll('.otp-input').forEach(input => {
+                    input.style.borderColor = '#EF4444'; input.style.transform = 'translateX(5px)';
+                    setTimeout(() => input.style.transform = 'translateX(-5px)', 100);
+                    setTimeout(() => input.style.transform = 'translateX(0)', 200);
+                    setTimeout(() => input.style.borderColor = '#EDE9FE', 1000);
+                });
+            }
+        }
+        function openGift() {
+            fireConfetti(); startFallingFlowers(); loadGallery();
+            const giftBox = document.getElementById('screen-gift');
+            giftBox.style.opacity = '0'; giftBox.style.transform = 'scale(0.8)'; giftBox.style.transition = 'all 0.5s ease';
+            setTimeout(() => { switchScreen('screen-gift', 'screen-final'); giftBox.style.opacity = '1'; giftBox.style.transform = 'scale(1)'; }, 500);
+        }
+
+        // Gallery & Custom CSS Lightbox
+        function loadGallery() {
+            const grid = document.getElementById('gallery-grid'); grid.innerHTML = '';
+            CONFIG.galleryData.forEach((item) => {
+                const wrapper = document.createElement('div'); wrapper.className = "photo-frame cursor-pointer";
+                wrapper.onclick = () => openLightbox(item);
+                const inner = document.createElement('div'); inner.className = "relative rounded-lg overflow-hidden aspect-[4/5] bg-gray-100";
+                if(item.type === "image") {
+                    inner.innerHTML = `<img src="${item.src}" class="w-full h-full object-cover">`;
+                } else {
+                    inner.innerHTML = `<video src="${item.src}" class="w-full h-full object-cover" muted></video>
+                                     <div class="absolute inset-0 flex items-center justify-center bg-black/20">
+                                        <div class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-brand-accent font-bold text-lg shadow-lg">▶</div>
+                                     </div>`;
+                }
+                const caption = document.createElement('p'); caption.className = "text-center text-xs font-bold text-gray-700 mt-2 tracking-wide"; caption.innerText = item.caption;
+                wrapper.appendChild(inner); wrapper.appendChild(caption); grid.appendChild(wrapper);
+            });
+        }
+        
+        function openLightbox(item) {
+            const lb = document.getElementById('lightbox');
+            const content = document.getElementById('lightbox-content');
+            
+            let mediaHTML = '';
+            if(item.type === "image") {
+                mediaHTML = `<img src="${item.src}" alt="${item.caption}">`;
+            } else {
+                bgm.pause();
+                mediaHTML = `<video src="${item.src}" controls autoplay playsinline></video>`;
+            }
+            
+            // Render struktur polaroid kustom dari CSS inline
+            content.innerHTML = `
+                <div class="lightbox-polaroid">
+                    ${mediaHTML}
+                    <p>${item.caption}</p>
+                </div>
+            `;
+            
+            lb.classList.add('show');
+        }
+        
+        function closeLightbox() {
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('show');
+            setTimeout(() => {
+                document.getElementById('lightbox-content').innerHTML = '';
+                if(isBgmPlaying) bgm.play();
+            }, 400); // Waktu sesuai durasi CSS transition (0.4s)
+        }
+    </script>
+</body>
+</html>
