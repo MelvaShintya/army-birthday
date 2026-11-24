@@ -774,6 +774,13 @@
       font-size: .9rem
     }
 
+    .wish .sig {
+      margin-top: 18px;
+      font-weight: 600;
+      color: var(--deep);
+      text-align: right
+    }
+
     .quote {
       margin-top: 18px;
       padding: 18px;
@@ -1182,6 +1189,7 @@
   <div class="bg"><b></b><b></b><b></b></div>
   <div id="fly"></div>
   <audio id="gA"></audio>
+  <audio id="bgm" loop></audio>
 
   <section id="lock" class="scr">
     <div class="card"><span class="tag">Belum waktunya</span>
@@ -1200,7 +1208,7 @@
         style="left:8%;bottom:0;animation-delay:-2s">🌸</span><span class="stk"
         style="right:6%;bottom:8%;animation-delay:-.5s">🎂</span>
     </div>
-    <p class="mute">Selesaikan semua ronde tantangan dulu sebelum membuka kadonya.</p>
+    <p class="mute">Katanya kamu Army banget jel, Coba selesein dulu soal nya baru baca Ucapan dari Ku</p>
     <button class="btn" onclick="startGame()">Mulai Tantangan</button>
   </section>
 
@@ -1250,6 +1258,7 @@
   <section id="gift" class="scr"><span class="tag">Terbuka</span>
     <h2 style="font-size:2rem">Tantangan Selesai 🎉</h2>
     <p class="mute">Ketuk kado untuk membukanya</p>
+    <p id="bgmHint" class="mute" style="font-size:.8rem;color:var(--deep)">🎵 d.ear, Jaehyun (디어, 재현) – Try Again</p>
     <div class="gb" id="gb" onclick="openGift()"><img id="gimg" class="gimg" src="assets/images/gift.png" alt="Kado">
       <div class="lid"></div>
       <div class="box"></div>
@@ -1263,12 +1272,21 @@
       <h2 class="grad" style="font-size:1.9rem;margin-top:6px">Hore, kadonya terbuka! 🎉</h2>
       <p class="mute" style="margin-top:8px">Ada surat, kenangan, dan doa kecil untukmu.<br>Scroll pelan-pelan ya ↓
       </p>
+      <p class="mute" style="font-size:.8rem;color:var(--deep);margin-top:6px">🎵 V (BTS) - Christmas Tree</p>
     </div>
     <div class="cn"></div>
     <div class="card wish rv"><span class="tag">Doa & Harapan untuk Jelita</span>
-      <p>Selamat bertambah usia, Jelita. Semoga di usia yang baru ini langkahmu selalu dimudahkan, hatimu dijaga dalam tenang, dan rezekimu mengalir penuh berkah.</p>
-      <p>Semoga setiap lelahmu berbuah manis, setiap mimpi yang kamu simpan pelan-pelan menemukan jalannya, dan kamu selalu dikelilingi orang-orang tulus yang menyayangimu.</p>
-      <p>Tetap sehat, tetap kuat, dan jangan pernah ragu untuk bersinar dengan caramu sendiri.</p>
+      <p>Selamat ulang tahun jelita<br>sekarang kamu udah 25 tahun ya, ga kerasa aku kenal kamu dah 3 tahun maybe.<br>Inget kan awal pertama kita kenal dan akrab ? Dari siaran freeline yang kamu pengen banget jalan jalan dan ikut aku, tiba tiba banget “ Ar jalan jalan yuk “<br>satu kata itu bikin kita deket sampai sekarang ya, ga nyangka juga wkwkwkw.</p>
+      <p>Jelita, Diva, Dipong wkwkw<br>apapun itu, aku ingin engkau tau bahwa sekarang diumur mu yang ke 25, kamu tidak tertinggal dalam hal apapun, kamu hanya sedang melakukan apa yang kamu suka dan mencari ritme yang kamu inginkan, aku mohon jangan terlalu keras dengan dirimu sendiri ya, jangan terlalu keras dengan Diva kecil itu. Ya mungkin kamu memang berusia 25 tahun, tapi di dalamnya ? Memang iya ?<br>Anak kecil yang masih takut dalam banyak hal itu ? Yang masih malu bahkan hanya sekedar bertanya takut untuk terlihat lemah bahkan takut menunjukan apa yang sebanrnya yang sedang ia rasakan.<br>Jangan terlalu keras ya sama diri sendiri, ya walaupun kamu bandel sekeras batu dan aku tau itu.</p>
+      <p>Diva,<br>Aku tidak terlalu tau banyak tentang dirimu yang ini, tapi aku tau bagian dimana kamu menceritakan saat SD sudah menjadi ketua geng wwkw.<br>Dan juga pengalaman mu dengan mantan mu itu, aku tidak akan mengomeli mu apa apa disini, karena ini harimu.<br>Aku hanya ingin berpesan jika kamu ingin membuka hatimu lagi, pastikan orangnya tepat, yang bisa menjaga mu dengan baik. Jika kamu masih ragu ya nggak usah. Aneh ya denger nasehat dari orang yang jomblo 6 tahun wkwkwkw.<br>Percayalah, aku adalah orang yang palig sayang dengan dirimu, orang yang paling peduli, jadi jika kemaren denger kamu di ghosting, siapa yang ga marah ?<br>Ga cuma kemaren, emang dikira kamu pas sama arvin ga ngomong sama aku, aku ga sakit hati ? Yeu dasar.</p>
+      <p>Kau selalu bertanya kan apa yang menarik dari dirimu ? Di ulang tahun mu ke 25 akan kujawab detail deh biar ga dikira membual aku.<br>Apakah kamu sadar banyak hal yang menarik tentang dirimu ?<br>Aku tidak membicarakan tentang bagaimana kamu berinteraksi dengan laki laki ya ? Seperti yang dipermasalahkan mantan mu yang bilang kamu terlalu friendly.<br>Aku membicarakan bagaimana kamu bisa mengahragai lawan bicara mu atau orang yang kamu anggap berharga, bagaimana kamu mengekspresikan nya yang aku pun percaya kamu tidak akan sadar.<br>Dan aku bagaimana orang orang ga baper jika ada cewe cantik yang sangat manis yang memperhatikan mereka ? Wajar nggak sih buat baper wkwkw.<br>Ditambah cewe ini sangat easy going dan bisa diajak pergi kemana pun, sungguh suasana yang sangat berbeda, iya sih, kalimat yang pas untuk menggambarkan mu adalah suasana baru yang begitu bebas.</p>
+      <p>Jadi nggak usah heran lagi ya kalo kamu berperilaku baik banyak yang suka.<br>Makanya jangan jadi cewe bingung, Senyuman mu terlalu indah dan sangat manis jel, sayang banget kalo diganti muka mu yang cemberut atau kamu yang sedang menangis.</p>
+      <p>Jelita,<br>Aku tau kesulitan yang kamu alami akhir akhir ini, makanya kadang sesekali kamu menghubungi ku<br>karena kamu menghubungiku ya ga lepas dari pas sumpek wkwkw<br>luapkan aja jel, jangan dipendem sendiri.<br>Aku tau smuanya sekarang lagi berat tapi kamu nggak harus menanggung semuanya sendiri itulah gunanya teman kan.</p>
+      <p>Owh yah, maaf ya kalo misalkan sikapku ke kamu ada yang berlebihan dan membuatmu ga nyaman, aku tau itu adalah kekurangan terbesarku si ke orang terdekat ku. Gabisa mengontrol bagaimana aku menunjukkan rasa sayangku. Jadi aku minta maaf ya jell</p>
+      <p>aku hanya selalu berdoa yang terbaik untukmu, senoga diumur mu yang ke 25 ini semua yang kamu inginkan bisa tercapai semua ya.<br>Semoga kamu juga sehat selalu ya jangan sakit sakit.<br>Semoga kamu juga selalu dilimpahkan rezeki yang melimpah.<br>Dan selalu dikelilingi oleh orang orang baik ya jelita.</p>
+      <p>HAHAHAHAHA,<br>banyak juga ya yang aku omongin ke kamu, maaf ya kalo selama ini au cuma bisa memelukmu lewat kata kataku dan lewat doa doa ku.<br>Maaf jika aku nggak bisa ngajak kamu keluar pas kamu sumpek kayak dulu.<br>Maaf, padahal aku ingin sekali.</p>
+      <p>Semoga lain kali ada kesempatan ya.<br>Sekali lagi, SELAMAT ULANG TAHUN YA JELITA</p>
+      <p class="sig">- peluk hangat, arkana</p>
       <div class="quote">"No matter who you are, where you’re from, your skin color, gender identity: speak
         yourself."<b>RM</b></div>
       <h2 class="grad" style="text-align:center;margin-top:22px">Borahae 💜</h2>
@@ -1307,8 +1325,12 @@
     const vd = (f, c) => ({ type: 'video', src: M + f, caption: c ?? f.replace(/\.[^.]+$/, '') });
 
     const CFG = {
-      unlock: "2026-10-25T00:00:00",
-      pwd: ["25", "11", "2001"],
+      unlock: "2026-11-24T00:00:00",
+      pwd: ["24", "11", "2001"],
+      audio: {
+        beforeGift: A + 'game/d.ear, Jaehyun - Try Again.mp3',
+        afterGift: A + 'game/V (BTS) - Christmas Tree.mp3'
+      },
       cover: [
         "20250507164039314.jpg",
         "20250507164039473.jpg",
@@ -1381,13 +1403,13 @@
         cover: C + "instagram-media.jpg (5).webp",
         items: [
           { type: 'voice', src: "assets/images/game/JIN (BTS 방탄소년단) - Epiphany (Official Audio) Easy Lyrics.mp3", caption: "Pesan audio untuk Jelita" },
-          vd(".I hope we’ll have many more days like this together, because I really miss spending a day with you.mp4"),
+          vd("I hope we’ll have many more days like this together, because I really miss spending a day with you.mp4"),
           vd("Can you see_ How beautiful and sweet you are_ Come on, don’t make me describe it any further..mp4"),
           im("Kost Pink Legend masih nggak _.webp"),
           vd("Tau sekarang kenapa aku selalu marah kalo kamu disakitin _ This smile as sincere and sweet as this must disappear from your face, I wouldn’t stand for it..mp4"),
           im("Terakhir kali nongkrong sebelum kamu boyong.jpg"),
-          vd("Jelita.mp4"),
-          vd("Video Jelita.mp4")
+          vd("Come to think of it, you're actually kind of cute, aren't you.mp4"),
+          vd("HAHAHAHA MISS YOU JELL.mp4")
         ]
       }
     };
@@ -1403,6 +1425,20 @@
 
     function sw(a, b) { $(a).classList.remove('on'); $(b).classList.add('on'); scrollTo({ top: 0, behavior: 'smooth' }) }
     const gA = $('gA');
+    const bgm = $('bgm');
+
+    function playBGM(src) {
+      if (!src) return;
+      if (bgm.src.endsWith(encodeURI(src)) && !bgm.paused) return;
+      bgm.src = src;
+      bgm.currentTime = 0;
+      bgm.play().catch(() => {});
+    }
+
+    function stopBGM() {
+      bgm.pause();
+      bgm.currentTime = 0;
+    }
 
     const cv = CFG.cover.slice(0, 6); let ord = cv.map((_, i) => i);
     $('st').innerHTML = cv.map((s, i) => `<div class="c" id="c${i}"><img src="${s}" alt="" onerror="this.src=ph('${PAL[i % 3][0]}','${PAL[i % 3][1]}')"></div>`).join('');
@@ -1453,7 +1489,12 @@
     const nx = (c, id, m) => { if (c.value.length >= m) $(id).focus() };
     function chk() {
       const v = [$('dd').value.padStart(2, '0'), $('mm').value.padStart(2, '0'), $('yy').value];
-      if (v.join() === CFG.pwd.join()) { $('pf').innerText = ''; sw('sec', 'gift') }
+      if (v.join() === CFG.pwd.join()) {
+        $('pf').innerText = '';
+        stopA();
+        playBGM(CFG.audio.beforeGift);
+        sw('sec', 'gift');
+      }
       else { $('pf').innerText = 'Kode belum sesuai, coba lagi ya.'; document.querySelectorAll('.otp input').forEach(i => { i.style.borderColor = '#D6456B'; setTimeout(() => i.style.borderColor = '', 900) }) }
     }
 
@@ -1461,6 +1502,7 @@
     function openGift() {
       const g = $('gb'); if (g.classList.contains('pop')) return; g.classList.add('pop');
       stopA();
+      playBGM(CFG.audio.afterGift);
       const colors = ['#A78BFA', '#D08AE8', '#F7A8D4', '#FFC9A3', '#fff'];
       confetti({ particleCount: 120, spread: 100, origin: { y: .55 }, colors });
       setTimeout(() => {
@@ -1508,6 +1550,7 @@
     }
     function openFolder() {
       const fd = $('fd'); if (fd.classList.contains('op')) return; fd.classList.add('op');
+      stopBGM();
       confetti({ particleCount: 40, spread: 70, origin: { y: .7 }, colors: ['#A78BFA', '#F7A8D4', '#FFC9A3'], scalar: .9 });
       setTimeout(() => { openSpace(); setTimeout(() => fd.classList.remove('op'), 600) }, 900);
     }
@@ -1547,6 +1590,7 @@
       $('space').classList.remove('on'); rio && rio.disconnect();
       document.querySelectorAll('#si .fl').forEach(e => { e._io && e._io.disconnect(); if (e._a) { e._a.pause(); e._a = null } });
       activeVN = null;
+      playBGM(CFG.audio.afterGift);
     }
     function showItem(it) {
       if (it.type === 'video' && activeVN) activeVN.pause();
