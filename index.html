@@ -1188,8 +1188,9 @@
 <body>
   <div class="bg"><b></b><b></b><b></b></div>
   <div id="fly"></div>
-  <audio id="gA"></audio>
-  <audio id="bgm" loop></audio>
+  <audio id="gA" preload="auto"></audio>
+  <audio id="bgm" preload="auto" loop></audio>
+  <audio id="fA" preload="auto" loop></audio>
 
   <section id="lock" class="scr">
     <div class="card"><span class="tag">Belum waktunya</span>
@@ -1328,8 +1329,9 @@
       unlock: "2026-11-24T00:00:00",
       pwd: ["24", "11", "2001"],
       audio: {
-        beforeGift: A + 'game/d.ear, Jaehyun - Try Again.mp3',
-        afterGift: A + 'game/V (BTS) - Christmas Tree.mp3'
+        opening: A + 'game/Jaehyun.mp3',
+        afterPwd: A + 'game/V.mp3',
+        folderSong: A + 'game/JIN (BTS 방탄소년단) - Epiphany (Official Audio) Easy Lyrics.mp3'
       },
       cover: [
         "20250507164039314.jpg",
@@ -1426,19 +1428,70 @@
     function sw(a, b) { $(a).classList.remove('on'); $(b).classList.add('on'); scrollTo({ top: 0, behavior: 'smooth' }) }
     const gA = $('gA');
     const bgm = $('bgm');
+    const fA = $('fA');
+    let desiredTrack = null;
 
-    function playBGM(src) {
+    function bindAudioFallback(el) {
+      el.onerror = () => {
+        const raw = el.dataset.rawSrc;
+        if (raw && !el.dataset.triedEncoded) {
+          el.dataset.triedEncoded = '1';
+          el.src = encodeURI(raw);
+          el.load();
+          return;
+        }
+        console.warn('Audio gagal dimuat:', raw || el.currentSrc);
+      };
+    }
+    [gA, bgm, fA].forEach(bindAudioFallback);
+
+    function setMediaSrc(el, src) {
+      el.dataset.rawSrc = src;
+      delete el.dataset.triedEncoded;
+      if (el.getAttribute('src') !== src) {
+        el.src = src;
+        el.load();
+      }
+    }
+
+    function playBGM(src, mode) {
       if (!src) return;
-      if (bgm.src.endsWith(encodeURI(src)) && !bgm.paused) return;
-      bgm.src = src;
-      bgm.currentTime = 0;
+      desiredTrack = mode || 'bgm';
+      fA.pause();
+      fA.currentTime = 0;
+      setMediaSrc(bgm, src);
       bgm.play().catch(() => {});
     }
 
-    function stopBGM() {
+    function stopBGM(clearDesired = false) {
+      if (clearDesired) desiredTrack = null;
       bgm.pause();
       bgm.currentTime = 0;
     }
+
+    function playFolderSong() {
+      desiredTrack = 'folder';
+      stopBGM(false);
+      const src = CFG.audio.folderSong;
+      if (!src) return;
+      setMediaSrc(fA, src);
+      fA.play().catch(() => {});
+    }
+
+    function stopFolderSong() {
+      fA.pause();
+      fA.currentTime = 0;
+    }
+
+    function unlockAudioOnGesture() {
+      if (desiredTrack === 'folder') {
+        if (fA.src && fA.paused) fA.play().catch(() => {});
+      } else if (desiredTrack) {
+        if (bgm.src && bgm.paused) bgm.play().catch(() => {});
+      }
+    }
+    document.addEventListener('pointerdown', unlockAudioOnGesture, { passive: true });
+    document.addEventListener('keydown', unlockAudioOnGesture, { passive: true });
 
     const cv = CFG.cover.slice(0, 6); let ord = cv.map((_, i) => i);
     $('st').innerHTML = cv.map((s, i) => `<div class="c" id="c${i}"><img src="${s}" alt="" onerror="this.src=ph('${PAL[i % 3][0]}','${PAL[i % 3][1]}')"></div>`).join('');
@@ -1448,21 +1501,39 @@
     $('gimg').onerror = function () { this.remove(); $('gb').classList.add('css') };
     const T = new Date(CFG.unlock).getTime();
     if (Date.now() < T) { $('lock').classList.add('on'); setInterval(() => { const d = T - Date.now(); if (d < 0) return location.reload(); const p = n => String(n).padStart(2, '0'); $('cd').innerText = `${Math.floor(d / 864e5)}h ${p(Math.floor(d % 864e5 / 36e5))}:${p(Math.floor(d % 36e5 / 6e4))}:${p(Math.floor(d % 6e4 / 1e3))}` }, 1000) }
-    else $('land').classList.add('on');
+    else {
+      $('land').classList.add('on');
+      playBGM(CFG.audio.opening, 'opening');
+    }
 
     /* game */
     let ri = 0;
-    function startGame() { ri = 0; sw('land', 'game'); load() }
+    function startGame() {
+      ri = 0;
+      sw('land', 'game');
+      load();
+      if (desiredTrack === 'opening' && bgm.src) bgm.play().catch(() => {});
+    }
     function stopA() { gA.pause(); gA.currentTime = 0; $('gpb').innerText = 'Putar Lagu'; $('gs').innerText = 'Siap diputar' }
-    function togAudio() { if (gA.paused) gA.play().then(() => { $('gpb').innerText = 'Jeda Lagu'; $('gs').innerText = 'Sedang diputar' }).catch(() => $('gs').innerText = 'Audio belum tersedia'); else { gA.pause(); $('gpb').innerText = 'Putar Lagu'; $('gs').innerText = 'Dijeda' } }
+    function togAudio() {
+      if (gA.paused) {
+        stopBGM(false);
+        gA.play().then(() => { $('gpb').innerText = 'Jeda Lagu'; $('gs').innerText = 'Sedang diputar' }).catch(() => $('gs').innerText = 'Audio belum tersedia');
+      } else {
+        gA.pause();
+        $('gpb').innerText = 'Putar Lagu';
+        $('gs').innerText = 'Dijeda';
+      }
+    }
     gA.onended = () => { $('gpb').innerText = 'Putar Lagu'; $('gs').innerText = 'Selesai diputar' };
     function load() {
       stopA(); const n = CFG.rounds.length;
       if (ri >= n) { confetti({ particleCount: 80, spread: 90, origin: { y: .6 } }); return setTimeout(() => sw('game', 'facts'), 700) }
       const d = CFG.rounds[ri]; $('gp').innerText = `${ri + 1} / ${n}`; $('gbar').style.width = (ri + 1) / n * 100 + '%'; $('gt').innerText = d.t; $('gf').innerText = '';
       const k = d.k; $('gv').classList.toggle('hide', k !== 'i'); $('ga').classList.toggle('hide', k !== 'a'); $('gw').classList.toggle('hide', k !== 's'); $('go').classList.toggle('hide', k === 's');
+      if (k === 'a') stopBGM(false);
       $('gcat').innerText = d.t.includes('Drakor') ? 'Ronde Drakor 🎬' : { i: 'Ronde Member', a: 'Ronde Lagu', s: 'Susun Kata' }[k];
-      if (k === 'i') { $('gi').src = d.img; $('gi').onerror = () => $('gi').src = ph('#E4DAFF', '#C9B3FF') } else if (k === 'a') { $('gh').innerText = d.h; gA.src = d.src; gA.load() } else word(d);
+      if (k === 'i') { $('gi').src = d.img; $('gi').onerror = () => $('gi').src = ph('#E4DAFF', '#C9B3FF') } else if (k === 'a') { $('gh').innerText = d.h; setMediaSrc(gA, d.src) } else word(d);
       $('go').innerHTML = '';
       (d.o || []).forEach(t => { const b = document.createElement('button'); b.className = 'opt'; b.innerText = t; b.onclick = () => ans(b, t, d.c); $('go').appendChild(b) });
     }
@@ -1492,7 +1563,7 @@
       if (v.join() === CFG.pwd.join()) {
         $('pf').innerText = '';
         stopA();
-        playBGM(CFG.audio.beforeGift);
+        playBGM(CFG.audio.afterPwd, 'afterPwd');
         sw('sec', 'gift');
       }
       else { $('pf').innerText = 'Kode belum sesuai, coba lagi ya.'; document.querySelectorAll('.otp input').forEach(i => { i.style.borderColor = '#D6456B'; setTimeout(() => i.style.borderColor = '', 900) }) }
@@ -1502,7 +1573,7 @@
     function openGift() {
       const g = $('gb'); if (g.classList.contains('pop')) return; g.classList.add('pop');
       stopA();
-      playBGM(CFG.audio.afterGift);
+      playBGM(CFG.audio.afterPwd, 'afterPwd');
       const colors = ['#A78BFA', '#D08AE8', '#F7A8D4', '#FFC9A3', '#fff'];
       confetti({ particleCount: 120, spread: 100, origin: { y: .55 }, colors });
       setTimeout(() => {
@@ -1550,7 +1621,7 @@
     }
     function openFolder() {
       const fd = $('fd'); if (fd.classList.contains('op')) return; fd.classList.add('op');
-      stopBGM();
+      playFolderSong();
       confetti({ particleCount: 40, spread: 70, origin: { y: .7 }, colors: ['#A78BFA', '#F7A8D4', '#FFC9A3'], scalar: .9 });
       setTimeout(() => { openSpace(); setTimeout(() => fd.classList.remove('op'), 600) }, 900);
     }
@@ -1574,12 +1645,18 @@
       $('space').scrollTop = 0; $('space').classList.add('on');
     }
     function voice(el, it) {
-      const a = new Audio(it.src), btn = el.querySelector('.vb'), tm = el.querySelector('span'), bs = [...el.querySelectorAll('.vw i')];
+      const a = new Audio(); setMediaSrc(a, it.src); bindAudioFallback(a);
+      const btn = el.querySelector('.vb'), tm = el.querySelector('span'), bs = [...el.querySelectorAll('.vw i')];
       let paused = false, done = false;
       const paint = () => { const n = a.duration ? Math.round(a.currentTime / a.duration * bs.length) : 0; bs.forEach((b, i) => b.classList.toggle('on', i < n)) };
       a.onloadedmetadata = () => tm.innerText = fmt(a.duration);
       a.ontimeupdate = () => { paint(); tm.innerText = fmt(a.currentTime) };
-      a.onplay = () => { if (activeVN && activeVN !== a) activeVN.pause(); activeVN = a; btn.innerText = 'Pause' };
+      a.onplay = () => {
+        stopFolderSong();
+        if (activeVN && activeVN !== a) activeVN.pause();
+        activeVN = a;
+        btn.innerText = 'Pause';
+      };
       a.onpause = () => { btn.innerText = 'Play'; if (activeVN === a) activeVN = null };
       a.onended = () => { done = true; a.currentTime = 0; paint() };
       btn.onclick = e => { e.stopPropagation(); if (a.paused) { paused = false; a.play().catch(() => { }) } else { paused = true; a.pause() } };
@@ -1590,10 +1667,12 @@
       $('space').classList.remove('on'); rio && rio.disconnect();
       document.querySelectorAll('#si .fl').forEach(e => { e._io && e._io.disconnect(); if (e._a) { e._a.pause(); e._a = null } });
       activeVN = null;
-      playBGM(CFG.audio.afterGift);
+      stopFolderSong();
+      playBGM(CFG.audio.afterPwd, 'afterPwd');
     }
     function showItem(it) {
       if (it.type === 'video' && activeVN) activeVN.pause();
+      if (it.type === 'video') stopFolderSong();
       clearInterval(timer);
       $('mv').innerHTML = (it.type === 'image' ? `<img src="${it.src}" alt="">` : `<video src="${it.src}" controls autoplay playsinline></video>`) + `<p style="margin-top:12px">${it.caption || ''}</p>`;
       $('modal').classList.add('on');
